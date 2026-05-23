@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rastreio TEA — Dr. Camilo Azeredo · Neurologia</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8f7f4;
+    --surface: #ffffff;
+    --border: #e4e2dc;
+    --text: #1a1917;
+    --muted: #6b6860;
+    --hint: #a8a59e;
+    --navy: #0d2960;
+    --navy-light: #e8ecf5;
+    --navy-mid: #7a90c0;
+    --teal: #1a7f6a;
+    --teal-light: #e0f5ef;
+    --amber: #c47a1a;
+    --amber-light: #fef3e0;
+    --red: #c0392b;
+    --red-light: #fdecea;
+    --green: #2e7d52;
+    --green-light: #e8f5ee;
+    --radius: 12px;
+    --radius-sm: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+  .container { max-width: 720px; margin: 0 auto; }
+
+  .clinic-header {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+  }
+  .clinic-logo img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+  }
+  .clinic-info { flex: 1; }
+  .clinic-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 2px;
+  }
+  .clinic-crm { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .clinic-contacts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .clinic-contact-item {
+    font-size: 12px; color: var(--muted);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .clinic-contact-item span.dot { color: var(--navy-mid); font-weight: 700; }
+  .clinic-right { text-align: right; flex-shrink: 0; }
+  .clinic-right .date { font-size: 12px; color: var(--hint); }
+  .clinic-right .label {
+    font-size: 11px; font-weight: 500; letter-spacing: .05em;
+    color: var(--navy); background: var(--navy-light);
+    padding: 3px 10px; border-radius: 20px; margin-top: 6px;
+    display: inline-block;
+  }
+
+  .step-bar { display: flex; align-items: center; gap: 6px; margin-bottom: 1.25rem; }
+  .step-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); transition: background .2s; }
+  .step-dot.active { background: var(--navy); }
+  .step-dot.done { background: var(--navy-mid); }
+  .step-lbl { font-size: 12px; color: var(--hint); margin-left: 6px; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.5rem; margin-bottom: 1rem; }
+  .section-lbl { font-size: 11px; font-weight: 500; letter-spacing: .07em; color: var(--hint); text-transform: uppercase; margin-bottom: 1rem; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+  .field input, .field select, .field textarea {
+    width: 100%; font-size: 14px; font-family: 'DM Sans', sans-serif;
+    padding: 9px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--bg); color: var(--text); outline: none; transition: border-color .15s;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--navy-mid); }
+  .field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+  .field.full { grid-column: 1 / -1; }
+
+  .consent-box {
+    background: var(--bg); border-radius: var(--radius-sm); padding: 1rem;
+    font-size: 13px; color: var(--muted); line-height: 1.7; margin-bottom: 1rem;
+    border-left: 3px solid var(--navy-mid);
+  }
+  .consent-check { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; color: var(--text); cursor: pointer; }
+  .consent-check input { margin-top: 3px; accent-color: var(--navy); flex-shrink: 0; }
+
+  .scale-pill { display: inline-block; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; margin-right: 6px; }
+  .pill-aq { background: var(--navy-light); color: var(--navy); }
+  .pill-raads { background: var(--teal-light); color: var(--teal); }
+  .scale-desc { font-size: 13px; color: var(--muted); }
+  .scale-header { display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+
+  .q-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 8px; transition: border-color .15s; }
+  .q-card.answered { border-color: #9aaad4; }
+  .q-top { display: flex; gap: 10px; margin-bottom: .75rem; }
+  .q-num { font-size: 12px; color: var(--hint); font-weight: 500; min-width: 18px; padding-top: 2px; }
+  .q-txt { font-size: 14px; color: var(--text); line-height: 1.5; flex: 1; }
+  .q-dom { font-size: 11px; color: var(--hint); white-space: nowrap; padding-top: 2px; }
+  .opts { display: flex; gap: 6px; flex-wrap: wrap; }
+  .opt {
+    border: 1px solid var(--border); border-radius: var(--radius-sm);
+    padding: 6px 13px; font-size: 12px; font-family: 'DM Sans', sans-serif;
+    color: var(--muted); background: var(--surface); cursor: pointer; transition: all .12s;
+  }
+  .opt:hover { border-color: var(--navy-mid); color: var(--text); }
+  .opt.sel-agree { background: var(--navy-light); border-color: var(--navy-mid); color: var(--navy); font-weight: 500; }
+  .opt.sel-disagree { background: #f0efec; border-color: #c8c6c0; color: #444; font-weight: 500; }
+  .opt.sel-always { background: var(--navy-light); border-color: var(--navy-mid); color: var(--navy); font-weight: 500; }
+  .opt.sel-sometimes { background: var(--amber-light); border-color: #f5c878; color: var(--amber); font-weight: 500; }
+  .opt.sel-rarely { background: #f0efec; border-color: #c8c6c0; color: #444; font-weight: 500; }
+  .opt.sel-never { background: var(--green-light); border-color: #9fd4b4; color: var(--green); font-weight: 500; }
+
+  .prog-wrap { margin: 1.25rem 0 0; }
+  .prog-info { display: flex; justify-content: space-between; font-size: 12px; color: var(--hint); margin-bottom: 6px; }
+  .prog-track { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 2px; transition: width .3s; }
+
+  .nav-row { display: flex; gap: 10px; margin-top: 1.25rem; }
+  .btn-back { padding: 11px 20px; font-size: 14px; font-family: 'DM Sans', sans-serif; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--muted); cursor: pointer; }
+  .btn-back:hover { background: var(--bg); }
+  .btn-next { flex: 1; padding: 11px 20px; font-size: 14px; font-weight: 500; font-family: 'DM Sans', sans-serif; border: none; border-radius: var(--radius-sm); background: var(--navy); color: #fff; cursor: pointer; transition: background .15s; }
+  .btn-next:hover { background: #1a3d80; }
+  .btn-next:disabled { background: var(--border); color: var(--hint); cursor: not-allowed; }
+
+  .result-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+  .result-title { font-family: 'DM Serif Display', serif; font-size: 22px; color: var(--text); }
+  .print-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; padding: 8px 16px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--muted); cursor: pointer; }
+  .print-btn:hover { background: var(--bg); }
+
+  .patient-bar { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: .875rem 1rem; font-size: 13px; color: var(--muted); margin-bottom: 1rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+  .patient-bar strong { color: var(--text); font-weight: 500; }
+
+  .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1rem; }
+  .score-card { background: var(--bg); border-radius: var(--radius-sm); padding: 1.25rem; text-align: center; border: 1px solid var(--border); }
+  .score-big { font-family: 'DM Serif Display', serif; font-size: 40px; display: block; }
+  .score-lbl { font-size: 13px; color: var(--muted); margin-top: 2px; }
+  .score-cut { font-size: 11px; color: var(--hint); margin-top: 3px; }
+  .score-flag { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; display: inline-block; margin-top: 8px; }
+  .flag-pos { background: var(--red-light); color: var(--red); }
+  .flag-neg { background: var(--green-light); color: var(--green); }
+
+  .interp-box { border-radius: var(--radius-sm); padding: 1rem 1.25rem; margin-bottom: 1rem; font-size: 14px; line-height: 1.7; border-left: 3px solid; }
+  .interp-high { background: var(--red-light); color: #6b1e18; border-color: var(--red); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+  .interp-mid { background: var(--amber-light); color: #6b3d00; border-color: var(--amber); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+  .interp-low { background: var(--green-light); color: #1a4d33; border-color: var(--green); border-radius: 0 var(--radius-sm) var(--radius-sm) 0; }
+
+  .dom-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .dom-name { font-size: 13px; color: var(--muted); width: 130px; flex-shrink: 0; }
+  .dom-bar-wrap { flex: 1; height: 5px; background: var(--border); border-radius: 3px; overflow: hidden; }
+  .dom-bar { height: 100%; border-radius: 3px; transition: width .6s; }
+  .dom-val { font-size: 12px; color: var(--hint); width: 36px; text-align: right; }
+
+  .obs-q { margin-bottom: 1rem; }
+  .obs-q label { font-size: 13px; color: var(--muted); display: block; margin-bottom: 5px; }
+  .obs-q p { font-size: 14px; color: var(--text); line-height: 1.6; }
+  .obs-empty { font-size: 13px; color: var(--hint); font-style: italic; }
+
+  .note-area { width: 100%; font-size: 14px; font-family: 'DM Sans', sans-serif; padding: 10px 12px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--bg); color: var(--text); min-height: 100px; resize: vertical; line-height: 1.6; margin-top: .5rem; }
+  .note-area:focus { outline: none; border-color: var(--navy-mid); }
+
+  .ref-tag { display: inline-block; font-size: 11px; padding: 3px 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 20px; color: var(--hint); margin: 3px 3px 0 0; }
+  .disclaimer { font-size: 12px; color: var(--hint); line-height: 1.7; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+  .hidden { display: none; }
+
+  @media print {
+    body { background: #fff; padding: 0; }
+    .nav-row, .print-btn, .step-bar { display: none !important; }
+    .card { box-shadow: none; border: 1px solid #ddd; break-inside: avoid; }
+    .clinic-header { break-inside: avoid; }
+    .note-area { border: 1px solid #ccc; min-height: 60px; }
+  }
+  @media (max-width: 520px) {
+    .form-grid { grid-template-columns: 1fr; }
+    .score-grid { grid-template-columns: 1fr; }
+    .patient-bar { gap: .75rem; }
+    .clinic-header { flex-wrap: wrap; }
+    .clinic-right { text-align: left; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="clinic-header">
+  <div class="clinic-logo">
+    <img src="data:image/png;base64,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" alt="Logo Dr. Camilo Azeredo">
+  </div>
+  <div class="clinic-info">
+    <div class="clinic-name">Dr. Camilo Augusto de Azeredo Coutinho Júnior</div>
+    <div class="clinic-crm">Neurologista · CRM-MG 38.950 · RQE 33.175</div>
+    <div class="clinic-contacts">
+      <div class="clinic-contact-item"><span class="dot">·</span> Rua Felipe dos Santos, 674 — Sala 601, Centro, Betim/MG</div>
+      <div class="clinic-contact-item"><span class="dot">·</span> (31) 3787-4742</div>
+      <div class="clinic-contact-item"><span class="dot">·</span> WhatsApp (31) 98260-6212</div>
+      <div class="clinic-contact-item"><span class="dot">·</span> drcamiloazeredo@gmail.com</div>
+    </div>
+  </div>
+  <div class="clinic-right">
+    <div class="date" id="date-display"></div>
+    <div class="label">Rastreio TEA · Adultos</div>
+  </div>
+</div>
+
+<div class="step-bar" id="step-bar">
+  <div class="step-dot active" id="sd0"></div>
+  <div class="step-dot" id="sd1"></div>
+  <div class="step-dot" id="sd2"></div>
+  <div class="step-dot" id="sd3"></div>
+  <div class="step-dot" id="sd4"></div>
+  <span class="step-lbl" id="step-lbl">Dados do paciente</span>
+</div>
+
+<!-- VIEW 0 -->
+<div id="view-0">
+  <div class="card">
+    <div class="section-lbl">Identificação do paciente</div>
+    <div class="form-grid">
+      <div class="field full"><label>Nome completo</label><input id="p-nome" type="text" placeholder="Nome completo"></div>
+      <div class="field"><label>Data de nascimento</label><input id="p-nasc" type="date"></div>
+      <div class="field"><label>Sexo biológico</label>
+        <select id="p-sexo"><option value="">Selecione</option><option>Feminino</option><option>Masculino</option><option>Intersexo</option></select>
+      </div>
+      <div class="field"><label>Identidade de gênero</label><input id="p-genero" type="text" placeholder="Como se identifica"></div>
+      <div class="field"><label>Escolaridade</label>
+        <select id="p-esc"><option value="">Selecione</option><option>Ensino fundamental</option><option>Ensino médio</option><option>Superior incompleto</option><option>Superior completo</option><option>Pós-graduação</option></select>
+      </div>
+      <div class="field"><label>Profissão</label><input id="p-prof" type="text" placeholder="Profissão atual"></div>
+      <div class="field"><label>Prontuário / código</label><input id="p-cod" type="text" placeholder="Opcional"></div>
+      <div class="field"><label>Data da consulta</label><input id="p-data-consulta" type="date"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-lbl">Histórico clínico</div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="field"><label>Queixa principal</label><textarea id="p-queixa" placeholder="Descreva o motivo da consulta em suas próprias palavras..."></textarea></div>
+      <div class="form-grid">
+        <div class="field"><label>Diagnósticos prévios</label><input id="p-diag" type="text" placeholder="Ex.: TDAH, ansiedade..."></div>
+        <div class="field"><label>Medicações em uso</label><input id="p-meds" type="text" placeholder="Ex.: Ritalina 10mg/dia"></div>
+      </div>
+      <div class="field"><label>Encaminhado por</label><input id="p-enc" type="text" placeholder="Médico, autoencaminhamento..."></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-lbl">Consentimento informado</div>
+    <div class="consent-box">
+      Este questionário é um instrumento de <strong>rastreio clínico</strong>, não diagnóstico. Os resultados serão utilizados exclusivamente para fins de avaliação neurológica, em conformidade com as normas do CFM e a LGPD (Lei nº 13.709/2018). As informações são mantidas sob sigilo profissional.
+    </div>
+    <label class="consent-check">
+      <input type="checkbox" id="consent-cb" onchange="chkConsent()">
+      Compreendo as informações acima e concordo em preencher este questionário com sinceridade, entendendo que não substitui avaliação diagnóstica.
+    </label>
+  </div>
+  <div class="nav-row">
+    <button class="btn-next" id="btn01" disabled onclick="goTo(1)">Iniciar questionário →</button>
+  </div>
+</div>
+
+<!-- VIEW 1: AQ-10 -->
+<div id="view-1" class="hidden">
+  <div class="card">
+    <div class="scale-header">
+      <span class="scale-pill pill-aq">AQ-10</span>
+      <span class="scale-desc">Autism Spectrum Quotient — Baron-Cohen et al., 2001</span>
+    </div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:1.25rem">Indique o quanto cada afirmação descreve você. Responda com base em como você realmente é, na maior parte do tempo.</p>
+    <div id="aq-list"></div>
+    <div class="prog-wrap">
+      <div class="prog-info"><span id="aq-prog">0 de 10 respondidas</span><span style="color:var(--navy)" id="aq-pct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill" id="aq-bar" style="width:0%;background:var(--navy)"></div></div>
+    </div>
+  </div>
+  <div class="nav-row">
+    <button class="btn-back" onclick="goTo(0)">← Voltar</button>
+    <button class="btn-next" id="btn12" disabled onclick="goTo(2)">Próxima parte →</button>
+  </div>
+</div>
+
+<!-- VIEW 2: RAADS-14 -->
+<div id="view-2" class="hidden">
+  <div class="card">
+    <div class="scale-header">
+      <span class="scale-pill pill-raads">RAADS-14</span>
+      <span class="scale-desc">Ritvo Autism Asperger Diagnostic Scale — Eriksson et al., 2013</span>
+    </div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:1.25rem">Para cada item, indique com que frequência a situação se aplica a você.</p>
+    <div id="raads-list"></div>
+    <div class="prog-wrap">
+      <div class="prog-info"><span id="r-prog">0 de 14 respondidas</span><span style="color:var(--teal)" id="r-pct">0%</span></div>
+      <div class="prog-track"><div class="prog-fill" id="r-bar" style="width:0%;background:var(--teal)"></div></div>
+    </div>
+  </div>
+  <div class="nav-row">
+    <button class="btn-back" onclick="goTo(1)">← Voltar</button>
+    <button class="btn-next" id="btn23" disabled onclick="goTo(3)">Próxima parte →</button>
+  </div>
+</div>
+
+<!-- VIEW 3: QUESTÕES ABERTAS -->
+<div id="view-3" class="hidden">
+  <div class="card">
+    <div class="section-lbl">Questões abertas complementares</div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:1.25rem">Estas perguntas ajudam o Dr. Camilo a compreender melhor o seu histórico. Responda apenas o que se sentir à vontade.</p>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div class="field"><label>Há algo sobre sua infância ou adolescência que considera relevante compartilhar?</label><textarea id="ob1" placeholder="Opcional..."></textarea></div>
+      <div class="field"><label>Como você descreveria suas relações sociais ao longo da vida?</label><textarea id="ob2" placeholder="Opcional..."></textarea></div>
+      <div class="field"><label>Existe algum interesse específico que ocupa grande parte do seu tempo ou pensamentos?</label><textarea id="ob3" placeholder="Opcional..."></textarea></div>
+      <div class="field"><label>Como você lida com mudanças de rotina ou imprevistos?</label><textarea id="ob4" placeholder="Opcional..."></textarea></div>
+      <div class="field"><label>Alguma informação adicional que gostaria de compartilhar?</label><textarea id="ob5" placeholder="Opcional..."></textarea></div>
+    </div>
+  </div>
+  <div class="nav-row">
+    <button class="btn-back" onclick="goTo(2)">← Voltar</button>
+    <button class="btn-next" onclick="calcAndShow()">Ver relatório clínico →</button>
+  </div>
+</div>
+
+<!-- VIEW 4: RESULTADO -->
+<div id="view-4" class="hidden">
+  <div class="result-header">
+    <div class="result-title">Relatório de rastreio</div>
+    <button class="print-btn" onclick="window.print()">🖨 Imprimir / PDF</button>
+  </div>
+  <div class="patient-bar" id="r-patient"></div>
+  <div class="card">
+    <div class="section-lbl">Pontuações das escalas</div>
+    <div class="score-grid" id="r-scores"></div>
+    <div id="r-interp"></div>
+  </div>
+  <div class="card">
+    <div class="section-lbl">Perfil por domínio — RAADS-14</div>
+    <div id="r-domains"></div>
+  </div>
+  <div class="card">
+    <div class="section-lbl">Anotações clínicas — Dr. Camilo Azeredo</div>
+    <p style="font-size:13px;color:var(--muted)">Uso exclusivo do médico responsável:</p>
+    <textarea class="note-area" placeholder="Impressões clínicas, hipóteses diagnósticas, condutas, encaminhamentos..."></textarea>
+  </div>
+  <div class="card">
+    <div class="section-lbl">Respostas às questões abertas</div>
+    <div id="r-obs"></div>
+  </div>
+  <div class="card">
+    <div style="font-size:13px;color:var(--muted);margin-bottom:.75rem">Referências bibliográficas:</div>
+    <span class="ref-tag">Baron-Cohen et al. (2001). J Autism Dev Disord.</span>
+    <span class="ref-tag">Eriksson et al. (2013). J Autism Dev Disord.</span>
+    <div class="disclaimer">
+      Instrumento de <strong>rastreio clínico</strong> — não constitui laudo ou diagnóstico. O diagnóstico de TEA requer avaliação clínica completa conforme DSM-5 e CID-11. Dados sob sigilo profissional e protegidos pela LGPD — Lei nº 13.709/2018.<br>
+      <strong>Dr. Camilo Augusto de Azeredo Coutinho Júnior · CRM-MG 38.950 · Neurologista</strong>
+    </div>
+  </div>
+  <div class="nav-row">
+    <button class="btn-back" onclick="goTo(3)">← Editar respostas</button>
+    <button class="btn-next" style="background:var(--teal)" onclick="newPat()">+ Novo paciente</button>
+  </div>
+</div>
+
+</div>
+<script>
+const aqItems=[
+  {id:'a1',txt:'Prefiro fazer coisas com outras pessoas a fazer coisas sozinho(a).',rev:true,dom:'Social'},
+  {id:'a2',txt:'Prefiro fazer as coisas sempre do mesmo jeito.',rev:false,dom:'Rotinas'},
+  {id:'a3',txt:'Se tento imaginar algo, é muito fácil criar uma imagem mental disso.',rev:true,dom:'Imaginação'},
+  {id:'a4',txt:'Frequentemente fico tão absorto(a) em uma coisa que esqueço outros compromissos.',rev:false,dom:'Foco'},
+  {id:'a5',txt:'Percebo com frequência pequenos sons que os outros não percebem.',rev:false,dom:'Sensorial'},
+  {id:'a6',txt:'Costumo notar sequências numéricas (matrículas, datas, códigos) espontaneamente.',rev:false,dom:'Detalhes'},
+  {id:'a7',txt:'Outras pessoas me dizem que o que eu disse foi indelicado, mesmo sem essa intenção.',rev:false,dom:'Social'},
+  {id:'a8',txt:'Quando leio uma história, consigo imaginar facilmente como os personagens se sentem.',rev:true,dom:'Social'},
+  {id:'a9',txt:'Sou fascinado(a) por datas ou sequências específicas.',rev:false,dom:'Detalhes'},
+  {id:'a10',txt:'Em um grupo social, consigo acompanhar várias conversas ao mesmo tempo.',rev:true,dom:'Social'},
+];
+const raadsItems=[
+  {id:'r1',txt:'É muito difícil para mim usar palavras para expressar meus sentimentos.',dom:'Linguagem'},
+  {id:'r2',txt:'Às vezes preciso me forçar a interagir socialmente, mesmo quando quero.',dom:'Social'},
+  {id:'r3',txt:'É difícil entender como outras pessoas se sentem durante conversas.',dom:'Social'},
+  {id:'r4',txt:'Às vezes preciso me lembrar de sorrir para parecer amigável.',dom:'Social'},
+  {id:'r5',txt:'Tenho interesses tão intensos que ficaria perturbado(a) se impedido(a) de realizá-los.',dom:'Interesses'},
+  {id:'r6',txt:'Outros consideram meu comportamento estranho ou excêntrico.',dom:'Social'},
+  {id:'r7',txt:'Fico muito incomodado(a) quando sou interrompido(a) no meio de algo.',dom:'Rotinas'},
+  {id:'r8',txt:'Quando ansioso(a), envolvo-me em comportamentos repetitivos para me acalmar.',dom:'Sensorial'},
+  {id:'r9',txt:'Sou muito sensível a sons, cheiros, gostos, texturas, luz ou dor.',dom:'Sensorial'},
+  {id:'r10',txt:'Situações do cotidiano me causam ansiedade intensa sem que eu saiba explicar por quê.',dom:'Ansiedade'},
+  {id:'r11',txt:'Fico perturbado(a) quando minha rotina é alterada.',dom:'Rotinas'},
+  {id:'r12',txt:'Tenho dificuldade para iniciar ou manter conversas.',dom:'Linguagem'},
+  {id:'r13',txt:'Minha voz soa incomum segundo outras pessoas (monótona, muito alta ou baixa, etc.).',dom:'Linguagem'},
+  {id:'r14',txt:'Tenho dificuldade em me colocar no lugar dos outros.',dom:'Social'},
+];
+const aqOpts=['Concordo totalmente','Concordo levemente','Discordo levemente','Discordo totalmente'];
+const raadsOpts=['Sempre','Às vezes','Raramente','Nunca'];
+const ans={};
+const stepLabels=['Dados do paciente','AQ-10','RAADS-14','Questões abertas','Relatório'];
+
+function init(){
+  document.getElementById('date-display').textContent=new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});
+  buildAQ(); buildRAA();
+}
+function buildAQ(){
+  const d=document.getElementById('aq-list'); d.innerHTML='';
+  aqItems.forEach((it,i)=>{
+    const opts=aqOpts.map((o,j)=>{const ac=j<2?'sel-agree':'sel-disagree';return '<button class="opt" onclick="pick(\''+it.id+'\','+j+',\''+ac+'\',this,\'aq\')">'+o+'</button>';}).join('');
+    d.innerHTML+='<div class="q-card" id="qc-'+it.id+'"><div class="q-top"><span class="q-num">'+(i+1)+'.</span><span class="q-txt">'+it.txt+'</span><span class="q-dom">'+it.dom+'</span></div><div class="opts" id="opts-'+it.id+'">'+opts+'</div></div>';
+  });
+}
+function buildRAA(){
+  const d=document.getElementById('raads-list'); d.innerHTML='';
+  const ac=['sel-always','sel-sometimes','sel-rarely','sel-never'];
+  raadsItems.forEach((it,i)=>{
+    const opts=raadsOpts.map((o,j)=>'<button class="opt" onclick="pick(\''+it.id+'\','+j+',\''+ac[j]+'\',this,\'raads\')">'+o+'</button>').join('');
+    d.innerHTML+='<div class="q-card" id="qc-'+it.id+'"><div class="q-top"><span class="q-num">'+(i+1)+'.</span><span class="q-txt">'+it.txt+'</span><span class="q-dom">'+it.dom+'</span></div><div class="opts" id="opts-'+it.id+'">'+opts+'</div></div>';
+  });
+}
+function pick(id,val,ac,btn,scale){
+  document.getElementById('opts-'+id).querySelectorAll('.opt').forEach(b=>b.className='opt');
+  btn.classList.add(ac);
+  ans[id]=val;
+  document.getElementById('qc-'+id).classList.add('answered');
+  updateProg(scale);
+}
+function updateProg(scale){
+  if(scale==='aq'){
+    const done=aqItems.filter(it=>it.id in ans).length;
+    document.getElementById('aq-prog').textContent=done+' de 10 respondidas';
+    document.getElementById('aq-pct').textContent=Math.round(done/10*100)+'%';
+    document.getElementById('aq-bar').style.width=Math.round(done/10*100)+'%';
+    document.getElementById('btn12').disabled=done<10;
+  } else {
+    const done=raadsItems.filter(it=>it.id in ans).length;
+    document.getElementById('r-prog').textContent=done+' de 14 respondidas';
+    document.getElementById('r-pct').textContent=Math.round(done/14*100)+'%';
+    document.getElementById('r-bar').style.width=Math.round(done/14*100)+'%';
+    document.getElementById('btn23').disabled=done<14;
+  }
+}
+function chkConsent(){
+  document.getElementById('btn01').disabled=!document.getElementById('consent-cb').checked;
+}
+function goTo(step){
+  for(let i=0;i<5;i++){
+    document.getElementById('view-'+i).classList.toggle('hidden',i!==step);
+    const dot=document.getElementById('sd'+i);
+    if(dot) dot.className='step-dot'+(i===step?' active':i<step?' done':'');
+  }
+  document.getElementById('step-lbl').textContent=stepLabels[step];
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function calcAndShow(){
+  let aqScore=0;
+  aqItems.forEach(it=>{if((it.rev?(ans[it.id]>=2):(ans[it.id]<=1)))aqScore++;});
+  let raadsScore=0;
+  const domMap={};
+  raadsItems.forEach(it=>{
+    const pts=[3,2,1,0][ans[it.id]];
+    raadsScore+=pts;
+    if(!domMap[it.dom])domMap[it.dom]={s:0,m:0};
+    domMap[it.dom].s+=pts; domMap[it.dom].m+=3;
+  });
+  const aboveAQ=aqScore>=6, aboveRAA=raadsScore>=14;
+  const nome=document.getElementById('p-nome').value||'—';
+  const nasc=document.getElementById('p-nasc').value;
+  let idade='—';
+  if(nasc){const diff=Date.now()-new Date(nasc).getTime();idade=Math.floor(diff/31557600000)+' anos';}
+  const sexo=document.getElementById('p-sexo').value||'—';
+  const cod=document.getElementById('p-cod').value;
+  const dataC=document.getElementById('p-data-consulta').value;
+  document.getElementById('r-patient').innerHTML=
+    '<div>Paciente: <strong>'+nome+'</strong></div>'+
+    '<div>Idade: <strong>'+idade+'</strong></div>'+
+    '<div>Sexo: <strong>'+sexo+'</strong></div>'+
+    (cod?'<div>Prontuário: <strong>'+cod+'</strong></div>':'')+
+    (dataC?'<div>Consulta: <strong>'+new Date(dataC+'T12:00').toLocaleDateString('pt-BR')+'</strong></div>':'<div>Data: <strong>'+new Date().toLocaleDateString('pt-BR')+'</strong></div>');
+  document.getElementById('r-scores').innerHTML=
+    '<div class="score-card"><span class="score-big" style="color:var(--navy)">'+aqScore+'</span><div class="score-lbl">AQ-10</div><div class="score-cut">Ponto de corte ≥ 6</div><span class="score-flag '+(aboveAQ?'flag-pos':'flag-neg')+'">'+(aboveAQ?'Acima do corte':'Abaixo do corte')+'</span></div>'+
+    '<div class="score-card"><span class="score-big" style="color:var(--teal)">'+raadsScore+'</span><div class="score-lbl">RAADS-14</div><div class="score-cut">Ponto de corte ≥ 14</div><span class="score-flag '+(aboveRAA?'flag-pos':'flag-neg')+'">'+(aboveRAA?'Acima do corte':'Abaixo do corte')+'</span></div>';
+  let cls,msg;
+  if(aboveAQ&&aboveRAA){cls='interp-high';msg='<strong>Ambas as escalas acima do ponto de corte.</strong> O perfil de respostas sugere presença significativa de características compatíveis com TEA. Recomenda-se avaliação diagnóstica aprofundada, incluindo entrevista clínica estruturada e, quando indicado, instrumentos complementares como ADOS-2 e ADI-R.';}
+  else if(aboveAQ||aboveRAA){cls='interp-mid';msg='<strong>Uma das escalas acima do ponto de corte.</strong> Algumas características foram identificadas em nível clinicamente relevante. Avaliação individualizada é recomendada para determinar a necessidade de investigação diagnóstica mais ampla.';}
+  else{cls='interp-low';msg='<strong>Ambas as escalas abaixo do ponto de corte.</strong> O rastreio não identificou características em nível sugestivo de TEA. Caso persistam dúvidas clínicas, outras hipóteses podem ser investigadas (TDAH, ansiedade social, etc.).';}
+  document.getElementById('r-interp').innerHTML='<div class="interp-box '+cls+'">'+msg+'</div>';
+  const dColors={Social:'#0d2960',Linguagem:'#1a7f6a',Rotinas:'#c47a1a',Sensorial:'#b5416a',Interesses:'#2271c3',Ansiedade:'#c0392b'};
+  document.getElementById('r-domains').innerHTML=Object.entries(domMap).map(([dom,{s,m}])=>{
+    const pct=Math.round(s/m*100);
+    return '<div class="dom-row"><span class="dom-name">'+dom+'</span><div class="dom-bar-wrap"><div class="dom-bar" style="width:'+pct+'%;background:'+(dColors[dom]||'#0d2960')+'"></div></div><span class="dom-val">'+s+'/'+m+'</span></div>';
+  }).join('');
+  const obsIds=['ob1','ob2','ob3','ob4','ob5'];
+  const obsLbls=['Infância e adolescência','Relações sociais','Interesses específicos','Rotina e mudanças','Informações adicionais'];
+  const obsHtml=obsIds.map((id,i)=>{const v=document.getElementById(id).value.trim();return v?'<div class="obs-q"><label>'+obsLbls[i]+'</label><p>'+v+'</p></div>':'';}).join('');
+  document.getElementById('r-obs').innerHTML=obsHtml||'<span class="obs-empty">Nenhuma resposta registrada.</span>';
+  goTo(4);
+}
+function newPat(){
+  Object.keys(ans).forEach(k=>delete ans[k]);
+  ['p-nome','p-nasc','p-sexo','p-genero','p-esc','p-prof','p-cod','p-data-consulta','p-queixa','p-diag','p-meds','p-enc','ob1','ob2','ob3','ob4','ob5'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el){el.tagName==='SELECT'?el.selectedIndex=0:el.value='';}
+  });
+  document.getElementById('consent-cb').checked=false;
+  document.getElementById('btn01').disabled=true;
+  buildAQ(); buildRAA();
+  updateProg('aq'); updateProg('raads');
+  goTo(0);
+}
+init();
+</script>
+</body>
+</html>
